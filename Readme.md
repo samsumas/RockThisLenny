@@ -2,5 +2,7 @@
 
 usage : 
 1. `git clone`
-2. open the main.html in your favorite browser
-3. click the tiles to get points
+2. `yarn install`
+3. `yarn run encore dev`
+4. open the main.html in your favorite browser
+5. click the tiles to get points
