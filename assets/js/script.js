@@ -20,12 +20,15 @@ let track = song;
 // xxox
 // xoox
 // oxxo
+//TODO: levels (with music and so)
 let bpm = 120; //bpm
 let takt = 60000 / bpm;
 let currTick = 0; //current tik
 let score = 0; //print score *100 to make it look cooler
 let canvas = document.createElement("canvas");
 let context = canvas.getContext("2d");
+let combo = 0; //combo counter
+let oldScore;
 
 
 const start = () => {
@@ -33,8 +36,16 @@ const start = () => {
     canvas.height = height;
     canvas.addEventListener('click', clickListener);
     document.body.insertBefore(canvas, document.body.childNodes[0]);
-    setInterval(update, takt);
+    countDown();
+    setInterval(update, takt); //TODO: recheck if this is running asynchron (it should wait for the countdown)
 }
+const countDown = () => {
+    for (i=3; i > 0; i--) {
+        //TODO: print a big (value of i) on screen for countdown
+        //TODO: add countdown sounds
+    }
+}
+
 
 const getValueAtTick = (i,j,t) => {
     if (loop > 0) {
@@ -50,6 +61,7 @@ const clickListener = (event) => {
     let y = event.pageY - canvas.offsetTop;
     y = canvas.width - y;
 
+    //TODO: add animation (when getting negative points)
     if (y < height / lookAhead) {
         if (x < width / 4) {
             if (getValueAt(0, lookAhead) > 0) {
@@ -91,6 +103,24 @@ const mod = (a,b) => {
     }
     return a;
 }
+
+const checkCombo = () => {
+    let sum = 0;
+    for (i=0; i<4; i++) {
+        sum += getValueAt(i, lookAhead);
+    }
+    if (score-oldScore == sum) {
+        //COMBO!!!
+        //TODO : add some cool animation
+        combo++;
+    } else {
+        //bonus points
+        //TODO : add some cool animation
+        if (combo > 3)
+            score += combo/2; //half point for everycombo
+        combo = 0;
+    }
+}
 const mod4 = (a) => mod(a,4);
 const drawColors = () => {
     let x = width/4;
@@ -127,6 +157,8 @@ const update = () => {
     clear();
     drawColors();
     drawBars();
+    checkCombo();
+    oldScore = score;
     currTick++;
     drawScore();
 }
