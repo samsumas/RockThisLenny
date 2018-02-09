@@ -1,3 +1,5 @@
+const song = require('./song.js').song;
+
 const width = 400;
 const height = 600;
 const barWidth = 30;
@@ -129,3 +131,6 @@ const update = () => {
     drawScore();
 }
 
+window.addEventListener('load', () => {
+    start();
+});
