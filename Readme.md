@@ -1,4 +1,4 @@
-##A Small Guitar Hero like html5 game : RockThisLenny
+# A Small Guitar Hero like html5 game : RockThisLenny
 
 usage : 
 1. `git clone`
