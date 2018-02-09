@@ -10,18 +10,28 @@ canvas {
 </style>
 </head>
 <body onload="start()">
+    <script src="./song.js"> </script>
 <script>
 const width = 400;
 const height = 400;
 const barWidth = 30;
 const barColor = "black";
 const bgColor = "white";
-const lookAhead = 7;
-const hSep = "gray"; //horizontal separator
+const lookAhead = 8;
+const hSep = "lightgrey"; //horizontal separator
 const hSepHeight = 8;
-let track = []; //array containing arrays of bool (track[x][y] = press y.th button at x.th tick?
-let takt = 120; //bpm
-let cuttTik = 0; //current tik
+const loop=20; //loop every 20 ticks, 0 to disable
+const buttons = [ "red", "blue", "green", "orange"];
+let track = [[true, false, false ,true], [1, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true]]; //array containing arrays of bool (track[x][y] = press y.th button at x.th tick?
+track = song;
+//TODO:
+// parser for files that looks like this : (x : do nothing, o = press)
+// xxox
+// xoox
+// oxxo
+let bpm = 120; //bpm
+let takt = 60000 / bpm;
+let currTick = 0; //current tik
 let canvas = document.createElement("canvas");
 let context = canvas.getContext("2d");
 
@@ -29,28 +39,57 @@ const start = () => {
     canvas.width = width;
     canvas.height = height;
     document.body.insertBefore(canvas, document.body.childNodes[0]);
-    update();
+    setInterval(update, takt);
 }
 const clear = () => {
     context.fillStyle = bgColor;
     context.fillRect(0, 0, width, height);
 }
-const drawBars = () => {
-    clear();
-    let x = [ width / 4 - (barWidth / 2), (width -barWidth) /2, (width * 3 /4)- (barWidth / 2)];
-    for (bar of x) {
-        context.fillStyle = barColor;
-        context.fillRect(bar, 0, barWidth, height);
+const mod = (a,b) => {
+    while(a > b) {
+        a-=b;
     }
+    while (a < 0) {
+        a+=b;
+    }
+    return a;
+}
+const mod4 = (a) => mod(a,4);
+const drawColors = () => {
+    let x = width/4;
+    let y = height/lookAhead;
+    for (i=0; i<4; i++) {
+        context.fillStyle = buttons[i];
+        for (j=0; j<lookAhead;j++) {
+            if (loop > 0) {
+                if (track[mod(lookAhead - 1 + currTick - j, loop)][i])
+                    context.fillRect(i*x, j*y, x, y);
+            } else {
+                if (track[lookAhead - 1 + currTick - j][i])
+                    context.fillRect(i*x, j*y, x, y);
+            }
+        }
+    }
+}
+const drawBars = () => {
     let a = height / lookAhead;
-    for(i=0; i<lookAhead;i++) {
-        context.fillStyle = hSep;
-        context.fillRect(0, i*a - (hSepHeight/2), width, i*a + (hSepHeight /2));
+    context.fillStyle = hSep;
+    for(i=1; i<lookAhead;i++) {
+        context.fillRect(0, i*a - (hSepHeight/2), width, hSepHeight);
+    }
+
+    let x = [ width / 4 - (barWidth / 2), (width -barWidth) /2, (width * 3 /4)- (barWidth / 2)];
+    context.fillStyle = barColor;
+    for (bar of x) {
+        context.fillRect(bar, 0, barWidth, height);
     }
 }
 
 const update = () => {
+    clear();
+    drawColors();
     drawBars();
+    currTick++;
 }
 
 
