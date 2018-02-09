@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body onload="start()">
+<script>
+const width = 400;
+const height = 400;
+const barWidth = 30;
+const barColor = "black";
+const bgColor = "white";
+const lookAhead = 7;
+const hSep = "gray"; //horizontal separator
+const hSepHeight = 8;
+let track = []; //array containing arrays of bool (track[x][y] = press y.th button at x.th tick?
+let takt = 120; //bpm
+let cuttTik = 0; //current tik
+let canvas = document.createElement("canvas");
+let context = canvas.getContext("2d");
+
+const start = () => {
+    canvas.width = width;
+    canvas.height = height;
+    document.body.insertBefore(canvas, document.body.childNodes[0]);
+    update();
+}
+const clear = () => {
+    context.fillStyle = bgColor;
+    context.fillRect(0, 0, width, height);
+}
+const drawBars = () => {
+    clear();
+    let x = [ width / 4 - (barWidth / 2), (width -barWidth) /2, (width * 3 /4)- (barWidth / 2)];
+    for (bar of x) {
+        context.fillStyle = barColor;
+        context.fillRect(bar, 0, barWidth, height);
+    }
+    let a = height / lookAhead;
+    for(i=0; i<lookAhead;i++) {
+        context.fillStyle = hSep;
+        context.fillRect(0, i*a - (hSepHeight/2), width, i*a + (hSepHeight /2));
+    }
+}
+
+const update = () => {
+    drawBars();
+}
+
+
+</script>
+</body>
+</html>
