@@ -32,7 +32,7 @@ let context = canvas.getContext("2d");
 const barWidth = 10;
 const lookAhead = 10;
 const hSepHeight = 8;
-const loop = track.length; //loop every 20 ticks, 0 to disable
+const loop = track.length-hSepHeight; //loop every 20 ticks, 0 to disable
 
 
 // definition of game variable
@@ -78,7 +78,7 @@ const keyListener = (event) => {
             //do nothing
     }
     if (c != -1) {
-        if (getValueAt(c, lookAhead) > 0) {
+        if (getValueAt(c, lookAhead - 1) > 0) {
             score.value++;
         } else {
             score.value--;
