@@ -1,20 +1,37 @@
-const song = require('./song.js').song;
+let track  = require('./song.js').song;
 
-const width = 400;
-const height = 600;
+const color = {
+    bar: 'black',
+    score: 'blue',
+    background: 'white',
+    horizontalSeparator: 'lightgrey',
+    buttons: ['red', 'blue', 'green', 'orange'],
+};
+
+const dimension = {
+    width: 400,
+    height: 600,
+};
+
+const score = {
+    value: 0,
+    old: 0,
+    combo: 0,
+    position: {
+        x: dimension.width * 1 / 2,
+        y: dimension.height * 1 / 10,
+    },
+    size: '50px',
+};
+
+let canvas = document.createElement("canvas");
+let context = canvas.getContext("2d");
+
 const barWidth = 30;
-const barColor = "black";
-const scoreColor = "blue";
-const scoreSize = "50px";
-const scorePos = { x:width *1/2, y:height *1/10}
-const bgColor = "white";
 const lookAhead = 10;
-const hSep = "lightgrey"; //horizontal separator
 const hSepHeight = 8;
 const loop=4; //loop every 20 ticks, 0 to disable
-const buttons = [ "red", "blue", "green", "orange"];
 //let track = [[true, false, false ,true], [1, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true]]; //array containing arrays of bool (track[x][y] = press y.th button at x.th tick?
-let track = song;
 //TODO:
 // parser for files that looks like this : (x : do nothing, o = press)
 // xxox
@@ -24,28 +41,22 @@ let track = song;
 let bpm = 120; //bpm
 let takt = 60000 / bpm;
 let currTick = 0; //current tik
-let score = 0; //print score *100 to make it look cooler
-let canvas = document.createElement("canvas");
-let context = canvas.getContext("2d");
-let combo = 0; //combo counter
-let oldScore;
-
 
 const start = () => {
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = dimension.width;
+    canvas.height = dimension.height;
     canvas.addEventListener('click', clickListener);
     document.body.insertBefore(canvas, document.body.childNodes[0]);
     countDown();
     setInterval(update, takt); //TODO: recheck if this is running asynchron (it should wait for the countdown)
 }
+
 const countDown = () => {
     for (i=3; i > 0; i--) {
         //TODO: print a big (value of i) on screen for countdown
         //TODO: add countdown sounds
     }
 }
-
 
 const getValueAtTick = (i,j,t) => {
     if (loop > 0) {
@@ -54,7 +65,9 @@ const getValueAtTick = (i,j,t) => {
         return track[lookAhead - 1 + t - j][i];
     }
 }
+
 const getValueAt = (i,j) => getValueAtTick(i,j,currTick);
+
 const clickListener = (event) => {
     let t = currTick;
     let x = event.pageX - canvas.offsetLeft;
@@ -62,38 +75,40 @@ const clickListener = (event) => {
     y = canvas.width - y;
 
     //TODO: add animation (when getting negative points)
-    if (y < height / lookAhead) {
-        if (x < width / 4) {
+    if (y < dimension.height / lookAhead) {
+        if (x < dimension.width / 4) {
             if (getValueAt(0, lookAhead) > 0) {
-                score++;
+                score.value++;
             } else {
-                score--;
+                score.value--;
             }
-        } else if (x < 2*width / 4) {
+        } else if (x < 2 * dimension.width / 4) {
             if (getValueAt(1, lookAhead) > 0) {
-                score++;
+                score.value++;
             } else {
-                score--;
+                score.value--;
             }
-        } else if (x < 3*width / 4) {
+        } else if (x < 3 * dimension.width / 4) {
             if (getValueAt(2, lookAhead) > 0) {
-                score++;
+                score.value++;
             } else {
-                score--;
+                score.value--;
             }
         } else {
             if (getValueAt(3, lookAhead) > 0) {
-                score++;
+                score.value++;
             } else {
-                score--;
+                score.value--;
             }
         }
     }
 }
+
 const clear = () => {
-    context.fillStyle = bgColor;
-    context.fillRect(0, 0, width, height);
+    context.fillStyle = color.background;
+    context.fillRect(0, 0, dimension.width, dimension.height);
 }
+
 const mod = (a,b) => {
     while(a > b) {
         a-=b;
@@ -104,52 +119,55 @@ const mod = (a,b) => {
     return a;
 }
 
+const mod4 = (a) => mod(a,4);
+
 const checkCombo = () => {
     let sum = 0;
     for (i=0; i<4; i++) {
         sum += getValueAt(i, lookAhead);
     }
-    if (score-oldScore == sum) {
+    if (score.value - score.old == sum) {
         //COMBO!!!
         //TODO : add some cool animation
-        combo++;
+        score.combo++;
     } else {
         //bonus points
         //TODO : add some cool animation
-        if (combo > 3)
-            score += combo/2; //half point for everycombo
-        combo = 0;
+        if (score.combo > 3)
+            score.value += score.combo / 2; //half point for everycombo
+        score.combo = 0;
     }
 }
-const mod4 = (a) => mod(a,4);
+
 const drawColors = () => {
-    let x = width/4;
-    let y = height/lookAhead;
-    for (i=0; i<4; i++) {
-        context.fillStyle = buttons[i];
-        for (j=0; j<lookAhead;j++) {
+    let x = dimension.width / 4;
+    let y = dimension.height / lookAhead;
+    for (i = 0; i < 4; i++) {
+        context.fillStyle = color.buttons[i];
+        for (j = 0; j < lookAhead; j++) {
             if (getValueAt(i,j))
-                context.fillRect(i*x, j*y, x, y);
+                context.fillRect(i * x, j * y, x, y);
         }
     }
 }
+
 const drawScore = () => {
-    context.fillStyle = scoreColor;
-    context.font = scoreSize + " Consolas";
-    context.fillText(100*score, scorePos.x, scorePos.y);
+    context.fillStyle = color.score;
+    context.font = score.size + " Consolas";
+    context.fillText(100 * score.value, score.position.x, score.position.y);
 }
 
 const drawBars = () => {
-    let a = height / lookAhead;
-    context.fillStyle = hSep;
+    let a = dimension.height / lookAhead;
+    context.fillStyle = color.horizontalSeparator;
     for(i=1; i<lookAhead;i++) {
-        context.fillRect(0, i*a - (hSepHeight/2), width, hSepHeight);
+        context.fillRect(0, i * a - (hSepHeight / 2), dimension.width, hSepHeight);
     }
 
-    let x = [ width / 4 - (barWidth / 2), (width -barWidth) /2, (width * 3 /4)- (barWidth / 2)];
-    context.fillStyle = barColor;
+    let x = [dimension.width / 4 - (barWidth / 2), (dimension.width - barWidth) / 2, (dimension.width * 3 / 4) - (barWidth / 2)];
+    context.fillStyle = color.bar;
     for (bar of x) {
-        context.fillRect(bar, 0, barWidth, height);
+        context.fillRect(bar, 0, barWidth, dimension.height);
     }
 }
 
@@ -158,7 +176,7 @@ const update = () => {
     drawColors();
     drawBars();
     checkCombo();
-    oldScore = score;
+    score.old = score.value;
     currTick++;
     drawScore();
 }
