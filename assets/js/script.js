@@ -1,3 +1,5 @@
+// This is a very serious repo. Please do not use any kind of humor and behave professionally.
+
 let track  = require('./song.js').generateRandomSong();
 
 //console.log(track);
@@ -8,6 +10,7 @@ const color = {
     background: 'white',
     horizontalSeparator: 'lightgrey',
     buttons: ['red', 'blue', 'green', 'orange'],
+    fire: 0 //TODO:when in a long combo : put this to one and print cool flames in the background
 };
 
 const dimension = {
@@ -15,9 +18,26 @@ const dimension = {
     height: 600,
 };
 
+//please ignore following strings, its only deko
+const combomessages = [
+    "$WAGGYBOY",
+    "Almost like Meltdown on Intel",
+    "This nearly proved P=NP!",
+    "COOOOOOOOOOOOMMMMMMMMMMBBBBBBBBBBOOOOOOOO",
+    "THIS LENNY IS ON FIREEEEEEE!"
+];
+
+const longcombomessages = [
+    "This combo was nearly as long as my penis. Nearly.",
+    "Cookiezi's becoming jealous!",
+    "This deserved one Cookie!"
+];
+
 const failmessages = [
     "Failed!",
+    "Maybe you should go back to studying...",
     "Missed a Tile!",
+    "Almost as sad as Meltdown with Intel",
     "it isn't that complicated, noob",
     "Try Harder!",
     "This isnt hard: just click the right tiles at the same Moment",
@@ -42,7 +62,7 @@ let context = canvas.getContext("2d");
 const barWidth = 10;
 const lookAhead = 10;
 const hSepHeight = 8;
-const loop = track.length-hSepHeight; //loop every 20 ticks, 0 to disable
+const loop = track.length-hSepHeight; //0 to disable
 
 
 // definition of game variable
@@ -100,6 +120,19 @@ const keyListener = (event) => {
     }
 }
 
+const shoutAtLousyPlayer = () => {
+    //TODO: print one from failmessages to Screen for 2 seconds
+    //in big red letters
+}
+const complimentGoodPlayer = () => {
+    //TODO: print one from combomessages to SCreen for 2 seconds
+    //in normalsized green letters (it has to be smaller then score:P)
+}
+const complimentVeryGoodPlayer = () => {
+    //TODO: print one from longcombomessages to Screen for 2 seconds
+    //in big lila letters
+}
+
 //listens to clicks
 const clickListener = (event) => {
     let t = currTick;
@@ -121,8 +154,12 @@ const clickListener = (event) => {
 }
 
 const clear = () => {
-    context.fillStyle = color.background;
-    context.fillRect(0, 0, dimension.width, dimension.height);
+    if (color.fire) {
+        //TODO:cool flames and stuff
+    } else {
+        context.fillStyle = color.background;
+        context.fillRect(0, 0, dimension.width, dimension.height);
+    }
 }
 
 const mod = (a,b) => {
@@ -145,12 +182,14 @@ const checkCombo = () => {
     if (sum != 0 && score.value - score.old == sum) {
         //COMBO!!!
         //TODO : add some cool animation
+        //color.fire = 1; //only uncomment this when the time comes
         score.combo++;
     } else {
         //bonus points
         //TODO : add some cool animation
         if (score.combo > 3)
             score.value += score.combo / 2; //half point for everycombo
+        color.fire = 0;
         score.combo = 0;
     }
 }
