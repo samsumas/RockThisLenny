@@ -1,4 +1,6 @@
-let track  = require('./song.js').song;
+let track  = require('./song.js').generateRandomSong();
+
+console.log(track);
 
 const color = {
     bar: 'black',
@@ -30,7 +32,7 @@ let context = canvas.getContext("2d");
 const barWidth = 10;
 const lookAhead = 10;
 const hSepHeight = 8;
-const loop = 4; //loop every 20 ticks, 0 to disable
+const loop = track.length; //loop every 20 ticks, 0 to disable
 
 
 // definition of game variable
@@ -62,7 +64,13 @@ const clickListener = (event) => {
     let y = event.pageY - canvas.offsetTop;
     y = canvas.width - y;
 
-    //TODO: add animation (when getting negative points)
+//    for (int i = 0; i < 4; i++) {
+//        if (getValueAt(1, lookAhead) > 0) {
+            
+
+
+
+    // TODO: add animation (when getting negative points)
     if (y < dimension.height / lookAhead) {
         if (x < dimension.width / 4) {
             if (getValueAt(0, lookAhead) > 0) {

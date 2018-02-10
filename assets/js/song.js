@@ -1,4 +1,15 @@
 module.exports = {
+    generateRandomSong: () => {
+        let song = [];
+        for (let i = 0; i < 60; i++) {
+            let tick = [];
+            for (let j = 0; j < 4; j++) {
+                tick.push(Math.floor(Math.random() * 3) == 2 ? 1 : 0);
+            }
+            song.push(tick);
+        }
+        return song;
+    },
     song: [
         [1, 0, 0, 0],
         [0, 1, 0, 0],
