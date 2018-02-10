@@ -15,10 +15,20 @@ const dimension = {
     height: 600,
 };
 
+const failmessages = [
+    "Failed!",
+    "Missed a Tile!",
+    "it isn't that complicated, noob",
+    "Try Harder!",
+    "This isnt hard: just click the right tiles at the same Moment",
+    "If you thought this is hard, try TI"
+];
+
 const score = {
     value: 0,
     old: 0,
     combo: 0,
+    clickedThisTick: [0, 0, 0, 0],
     position: {
         x: dimension.width * 1 / 2,
         y: dimension.height * 1 / 10,
@@ -53,10 +63,10 @@ const start = () => {
 }
 
 const countDown = () => {
-    for (i=3; i > 0; i--) {
-        //TODO: print a big (value of i) on screen for countdown
-        //TODO: add countdown sounds
-    }
+//  for (i=3; i > 0; i--) {
+//      //TODO: print a big (value of i) on screen for countdown
+//      //TODO: add countdown sounds
+//  }
 }
 
 const keyListener = (event) => {
@@ -78,11 +88,14 @@ const keyListener = (event) => {
             //do nothing
     }
     if (c != -1) {
+        if (score.clickedThisTick[c])
+            return; // do nothing
         if (getValueAt(c, lookAhead - 1) > 0) {
             score.value++;
         } else {
             score.value--;
         }
+        score.clickedThisTick[c] = 1;
         return;
     }
 }
@@ -209,12 +222,16 @@ const update = () => {
     clear();
     drawColors();
     drawBars();
-    checkCombo();
-    score.old = score.value;
     offset += speedScare;
     if (offset > dimension.height / lookAhead) {
         offset = speedScare;
         currTick++;
+        //following things has to be done one time per tick
+        checkCombo();
+        score.old = score.value;
+        for (i=0; i<4; i++) {
+            score.clickedThisTick[i] = 0;
+        }
     }
     drawScore();
 }
