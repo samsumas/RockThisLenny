@@ -86,6 +86,7 @@ const keyListener = (event) => {
         return;
     }
 }
+
 //listens to clicks
 const clickListener = (event) => {
     let t = currTick;
@@ -93,35 +94,15 @@ const clickListener = (event) => {
     let y = event.pageY - canvas.offsetTop;
     y = canvas.width - y;
 
-//    for (int i = 0; i < 4; i++) {
-//        if (getValueAt(1, lookAhead) > 0) {
-
-    // TODO: add animation (when getting negative points)
-    if (y < dimension.height / lookAhead) {
-        if (x < dimension.width / 4) {
-            if (getValueAt(0, lookAhead) > 0) {
+    for (i = 0; i < 4; i++) {
+        if (x < dimension.width * (1+i)/ 4) {
+            if (getValueAt(i, lookAhead-1) > 0) {
                 score.value++;
             } else {
                 score.value--;
+                //TODO: make animation
             }
-        } else if (x < 2 * dimension.width / 4) {
-            if (getValueAt(1, lookAhead) > 0) {
-                score.value++;
-            } else {
-                score.value--;
-            }
-        } else if (x < 3 * dimension.width / 4) {
-            if (getValueAt(2, lookAhead) > 0) {
-                score.value++;
-            } else {
-                score.value--;
-            }
-        } else {
-            if (getValueAt(3, lookAhead) > 0) {
-                score.value++;
-            } else {
-                score.value--;
-            }
+            break;
         }
     }
 }
