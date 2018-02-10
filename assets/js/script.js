@@ -1,6 +1,6 @@
 let track  = require('./song.js').generateRandomSong();
 
-console.log(track);
+//console.log(track);
 
 const color = {
     bar: 'black',
@@ -45,6 +45,7 @@ let speedScare = 4;
 const start = () => {
     canvas.width = dimension.width;
     canvas.height = dimension.height;
+    document.addEventListener('keydown', keyListener);
     canvas.addEventListener('click', clickListener);
     document.body.insertBefore(canvas, document.body.childNodes[0]);
     countDown();
@@ -58,6 +59,34 @@ const countDown = () => {
     }
 }
 
+const keyListener = (event) => {
+    let c = -1;
+    switch (event.keyCode) {
+        case 81: //q
+            c=0;
+            break;
+        case 87: //w
+            c=1;
+            break;
+        case 69: //e
+            c=2;
+            break;
+        case 82: //r
+            c=3;
+            break;
+        default:
+            //do nothing
+    }
+    if (c != -1) {
+        if (getValueAt(c, lookAhead) > 0) {
+            score.value++;
+        } else {
+            score.value--;
+        }
+        return;
+    }
+}
+//listens to clicks
 const clickListener = (event) => {
     let t = currTick;
     let x = event.pageX - canvas.offsetLeft;
@@ -66,9 +95,6 @@ const clickListener = (event) => {
 
 //    for (int i = 0; i < 4; i++) {
 //        if (getValueAt(1, lookAhead) > 0) {
-            
-
-
 
     // TODO: add animation (when getting negative points)
     if (y < dimension.height / lookAhead) {
@@ -122,7 +148,7 @@ const checkCombo = () => {
     for (i=0; i<4; i++) {
         sum += getValueAt(i, lookAhead);
     }
-    if (score.value - score.old == sum) {
+    if (sum != 0 && score.value - score.old == sum) {
         //COMBO!!!
         //TODO : add some cool animation
         score.combo++;
