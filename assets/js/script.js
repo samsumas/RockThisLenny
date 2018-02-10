@@ -27,20 +27,18 @@ const score = {
 let canvas = document.createElement("canvas");
 let context = canvas.getContext("2d");
 
-const barWidth = 30;
+const barWidth = 10;
 const lookAhead = 10;
 const hSepHeight = 8;
-const loop=4; //loop every 20 ticks, 0 to disable
-//let track = [[true, false, false ,true], [1, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true], [true, false, false ,true]]; //array containing arrays of bool (track[x][y] = press y.th button at x.th tick?
-//TODO:
-// parser for files that looks like this : (x : do nothing, o = press)
-// xxox
-// xoox
-// oxxo
-//TODO: levels (with music and so)
+const loop = 4; //loop every 20 ticks, 0 to disable
+
+
+// definition of game variable
 let bpm = 120; //bpm
 let takt = 60000 / bpm;
 let currTick = 0; //current tik
+let offset = 0;
+let speedScare = 4;
 
 const start = () => {
     canvas.width = dimension.width;
@@ -48,7 +46,7 @@ const start = () => {
     canvas.addEventListener('click', clickListener);
     document.body.insertBefore(canvas, document.body.childNodes[0]);
     countDown();
-    setInterval(update, takt); //TODO: recheck if this is running asynchron (it should wait for the countdown)
+    setInterval(update, 60); //TODO: recheck if this is running asynchron (it should wait for the countdown)
 }
 
 const countDown = () => {
@@ -57,16 +55,6 @@ const countDown = () => {
         //TODO: add countdown sounds
     }
 }
-
-const getValueAtTick = (i,j,t) => {
-    if (loop > 0) {
-        return track[mod(lookAhead - 1 + t - j, loop)][i];
-    } else {
-        return track[lookAhead - 1 + t - j][i];
-    }
-}
-
-const getValueAt = (i,j) => getValueAtTick(i,j,currTick);
 
 const clickListener = (event) => {
     let t = currTick;
@@ -139,45 +127,80 @@ const checkCombo = () => {
     }
 }
 
+
+const getValueAtTick = (i,j,t) => {
+    if (loop > 0) {
+        return track[mod(lookAhead - 1 + t - j, loop)][i];
+    } else {
+        return track[lookAhead - 1 + t - j][i];
+    }
+}
+
+const getValueAt = (i,j) => getValueAtTick(i,j,currTick);
+
+/**
+ * Print scare
+ */
 const drawColors = () => {
     let x = dimension.width / 4;
     let y = dimension.height / lookAhead;
     for (i = 0; i < 4; i++) {
-        context.fillStyle = color.buttons[i];
+        context.fillStyle = color.buttons[i]; // TODO make it random
         for (j = 0; j < lookAhead; j++) {
             if (getValueAt(i,j))
-                context.fillRect(i * x, j * y, x, y);
+                context.fillRect(i * x, j * y + offset, x, y);
         }
     }
 }
 
+/**
+ * Print the actual score
+ */
 const drawScore = () => {
     context.fillStyle = color.score;
     context.font = score.size + " Consolas";
     context.fillText(100 * score.value, score.position.x, score.position.y);
 }
 
+/**
+ * Print separator between square
+ */
 const drawBars = () => {
     let a = dimension.height / lookAhead;
+
+    // print horizontal separator
     context.fillStyle = color.horizontalSeparator;
-    for(i=1; i<lookAhead;i++) {
-        context.fillRect(0, i * a - (hSepHeight / 2), dimension.width, hSepHeight);
+    for(i = 1; i < lookAhead; i++) {
+        context.fillRect(0, i * a - (hSepHeight / 2) + offset, dimension.width, hSepHeight);
     }
 
-    let x = [dimension.width / 4 - (barWidth / 2), (dimension.width - barWidth) / 2, (dimension.width * 3 / 4) - (barWidth / 2)];
+    // print vertical separator
+    let x = [
+        dimension.width / 4 - (barWidth / 2),
+        (dimension.width - barWidth) / 2,
+        (dimension.width * 3 / 4) - (barWidth / 2)
+    ];
+
     context.fillStyle = color.bar;
     for (bar of x) {
         context.fillRect(bar, 0, barWidth, dimension.height);
     }
 }
 
+/**
+ * Update screen
+ */
 const update = () => {
     clear();
     drawColors();
     drawBars();
     checkCombo();
     score.old = score.value;
-    currTick++;
+    offset += speedScare;
+    if (offset > dimension.height / lookAhead) {
+        offset = speedScare;
+        currTick++;
+    }
     drawScore();
 }
 
